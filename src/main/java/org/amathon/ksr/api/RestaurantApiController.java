@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +12,13 @@ import lombok.AllArgsConstructor;
 import org.amathon.ksr.api.dto.StarDTO;
 import org.amathon.ksr.application.RestaurantService;
 import org.amathon.ksr.domain.Restaurant;
+import org.amathon.ksr.domain.repository.RestaurantRepository;
 import org.amathon.ksr.infrastructure.remote.PoiRestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +34,8 @@ public class RestaurantApiController {
   private PoiRestTemplate poiRestTemplate;
 
   private RestaurantService restaurantService;
+
+  private RestaurantRepository repository;
 
   @ApiOperation(value = "위치기반 주변 음식점 검색", produces = "application/json")
   @ApiImplicitParams({
@@ -105,6 +110,34 @@ public class RestaurantApiController {
       result.put("message", "FAIL");
       entity = new ResponseEntity(result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    return entity;
+  }
+
+  @ApiOperation("카테고리별 맛집조회")
+
+  @GetMapping("/{category}")
+  public ResponseEntity<Map<String, Object>> asdf(
+      @PathVariable("category")
+      @ApiParam(
+          value = "category",
+          required = true,
+
+          allowableValues = "한식,양식,중식,족발,보쌈,패스트푸드,야식,디저트,치킨,피자"
+      )
+          String category) {
+
+    ResponseEntity<Map<String, Object>> entity = null;
+
+    Map<String, Object> map = new HashMap();
+
+    List<Restaurant> restaurants =
+        repository.findALLOrderByDistance("37.4923661", "127.0205431", category);
+
+    map.put("restaurants", restaurants);
+    map.put("messages", "SUCCESS");
+
+    entity = new ResponseEntity<>(map, HttpStatus.OK);
 
     return entity;
   }

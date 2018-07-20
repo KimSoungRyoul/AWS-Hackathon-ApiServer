@@ -24,4 +24,27 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
   )
   List<Restaurant> findALLOrderByDistance(@Param("nowLat") String nowLat,
       @Param("nowLon") String nowLon, @Param("searchKeyword") String searchKeyword);
+
+
+  @Query(
+      value =
+          "SELECT * ,\n"
+              + "\t(6371*acos(cos(radians(:nowLat))*cos(radians(lat))*cos(radians(lon)\n"
+              + "\t-radians(:nowLon))+sin(radians(:nowLat))*sin(radians(lat))))\n"
+              + "\tAS distance\n"
+              + "\n"
+              + "FROM amathon_db.restaurant  \n"
+              + "where low_biz_name = :searchKeyword"
+              + " HAVING distance <= 0.9"
+              + " ORDER BY distance"
+              + " LIMIT 0,20\n",
+      nativeQuery = true
+  )
+  List<Restaurant> findCategoryOrderByDistance(@Param("nowLat") String nowLat,
+      @Param("nowLon") String nowLon, @Param("searchKeyword") String searchKeyword);
+
+
+
+
+
 }

@@ -9,4 +9,5 @@ public class KsrApplication {
   public static void main(String[] args) {
     SpringApplication.run(KsrApplication.class, args);
   }
+
 }

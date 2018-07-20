@@ -39,3 +39,13 @@ spring:
 server:
   port: 8080
   servlet-path: /api
+
+
+jsa:
+  s3:
+    bucket: amathonbucket
+
+  aws:
+    credentials:
+      accessKey: AKIAJECLUXCH7VZZXMSQ
+      secretKey: 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

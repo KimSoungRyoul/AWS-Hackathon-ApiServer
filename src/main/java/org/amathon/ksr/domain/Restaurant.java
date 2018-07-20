@@ -56,5 +56,7 @@ public class Restaurant {
   @Lob
   private String description = "";
 
+  @ApiModelProperty(value = "대표사진 경로")
+  private String imgUrl;
 
 }
