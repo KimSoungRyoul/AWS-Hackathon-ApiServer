@@ -54,6 +54,9 @@ public class RestaurantServiceImpl implements RestaurantService {
       rating.setPriceRating(priceRating);
       rating.setTasteRating(tasteRating);
       rating.setEvaluaterCnt(rating.getEvaluaterCnt() + 1);
+
+      rating.setTotalRating(
+          (rating.getInteriorRating() + rating.getPriceRating() + rating.getTasteRating()) / 3);
       restaurant.setRating(rating);
     }
     restaurantRepository.save(restaurant);
@@ -64,7 +67,7 @@ public class RestaurantServiceImpl implements RestaurantService {
   public List<Restaurant> searchRestaurants(String lat, String lon, String searchKeyword,
       String orderby) {
 
-    List<Restaurant> restaurants = poiRestTemplate.searchRestaurants(lat, lon, searchKeyword);
+    /*List<Restaurant> restaurants = poiRestTemplate.searchRestaurants(lat, lon, searchKeyword);
 
     for (Restaurant restaurant : restaurants) {
 
@@ -72,7 +75,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurantRepository.save(restaurant);
       }
 
-    }
+    }*/
 
     List<Restaurant> restaurantList = restaurantRepository
         .findALLOrderByDistance(lat, lon, searchKeyword);

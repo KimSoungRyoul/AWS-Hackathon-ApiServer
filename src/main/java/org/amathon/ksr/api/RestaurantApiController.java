@@ -1,9 +1,12 @@
 package org.amathon.ksr.api;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.amathon.ksr.api.dto.StarDTO;
 import org.amathon.ksr.application.RestaurantService;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/restaurants")
 @AllArgsConstructor(onConstructor = @__(@Autowired))
+@Api(value = "맛집API", description = "맛집 검색및 별점등록...")
 public class RestaurantApiController {
 
   private PoiRestTemplate poiRestTemplate;
@@ -42,21 +46,42 @@ public class RestaurantApiController {
       )
   })
   @GetMapping
-  public ResponseEntity<List<Restaurant>> getRestaurantList(
+  public ResponseEntity<Map<String, Object>> getRestaurantList(
       @RequestParam("lat") String lat,
       @RequestParam("lon") String lon,
       @RequestParam("searchKeyword") String searchKeyword,
       @RequestParam("orderby") String orderby) {
 
-    ResponseEntity<List<Restaurant>> entity = null;
+    ResponseEntity<Map<String, Object>> entity = null;
 
-    List<Restaurant> restaurants = restaurantService
-        .searchRestaurants(lat, lon, searchKeyword, orderby);
+    try {
 
-    System.out.println("--------------------------------" + searchKeyword);
-    entity = new ResponseEntity(restaurants, HttpStatus.OK);
+      List<Restaurant> restaurants =
+          restaurantService.searchRestaurants(lat, lon, searchKeyword, orderby);
 
+      System.out.println("--------------------------------" + searchKeyword);
+
+      Map<String, Object> result = new HashMap();
+      result.put("message", "SUCCESS");
+      result.put("restaurants", restaurants);
+
+      entity = new ResponseEntity(result, HttpStatus.OK);
+
+    } catch (Exception e) {
+      Map<String, Object> result = new HashMap();
+      result.put("message", "FAIL");
+
+      entity = new ResponseEntity(result, HttpStatus.INTERNAL_SERVER_ERROR);
+      e.printStackTrace();
+    }
     return entity;
+  }
+
+  @ApiOperation(value = "Model 등록용 사용 X")
+  @GetMapping("/unUse")
+  public ResponseEntity<Restaurant> asdf() {
+
+    return new ResponseEntity<>(new Restaurant(), HttpStatus.OK);
   }
 
   @ApiOperation(value = "별점 주기", produces = "application/json")
@@ -67,13 +92,19 @@ public class RestaurantApiController {
 
     try {
 
+      Map<String, Object> result = new HashMap();
+      result.put("message", "SUCCESS");
+
       restaurantService.evaluateRestaurant(starDTO);
+
+      entity = new ResponseEntity(result, HttpStatus.CREATED);
 
     } catch (Exception e) {
       e.printStackTrace();
+      Map<String, Object> result = new HashMap();
+      result.put("message", "FAIL");
+      entity = new ResponseEntity(result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    entity = new ResponseEntity(HttpStatus.CREATED);
 
     return entity;
   }

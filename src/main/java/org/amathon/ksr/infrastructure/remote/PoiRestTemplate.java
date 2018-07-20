@@ -49,7 +49,7 @@ public class PoiRestTemplate {
               .queryParam("radius", radius)
               .queryParam("searchKeyword", searchKeyword)
               .queryParam("page", pageNum)
-              .queryParam("count", "20")
+              .queryParam("count", "200")
               .build()
               .encode("UTF-8")
               .toUri();
